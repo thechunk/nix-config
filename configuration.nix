@@ -125,6 +125,15 @@ in
       };
     };
 
+    home.file = {
+      ".config/niri" = {
+        source = config.lib.file.mkOutOfStoreSymlink ../dotfiles/niri;
+      };
+      ".config/nvim" = {
+        source = config.lib.file.mkOutOfStoreSymlink ../dotfiles/nvim;
+      };
+    };
+
     home.stateVersion = "25.05";
   };
 
