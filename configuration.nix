@@ -75,7 +75,7 @@ in
     packages = with pkgs; [];
   };
 
-  home-manager.users.russellc = { pkgs, ... }: {
+  home-manager.users.russellc = { pkgs, config, ... }: {
     home.packages = with pkgs; [
       alacritty
       librewolf
@@ -111,6 +111,18 @@ in
       };
     };
 
+    programs.mise = {
+      enable = true;
+      globalConfig = {
+        tools = {
+          erlang = "28.0";
+          elixir = "1.18.4-otp-28";
+          go = "1.24.1";
+          ruby = "3.4.4";
+        };
+      };
+    };
+
     # programs.neovim = {
     #   enable = true;
     #   package = pkgs.neovim;
@@ -127,10 +139,14 @@ in
 
     home.file = {
       ".config/niri" = {
-        source = config.lib.file.mkOutOfStoreSymlink ../dotfiles/niri;
+        source = config.lib.file.mkOutOfStoreSymlink ./dotfiles/niri;
+        recursive = true;
+        force = true;
       };
       ".config/nvim" = {
-        source = config.lib.file.mkOutOfStoreSymlink ../dotfiles/nvim;
+        source = config.lib.file.mkOutOfStoreSymlink ./dotfiles/nvim;
+        recursive = true;
+        force = true;
       };
     };
 
@@ -144,6 +160,10 @@ in
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     git
+    rocmPackages.clang
+    gnumake
+    automake
+    autoconf
   #  wget
   ];
 
