@@ -11,29 +11,19 @@ in
     [ # Include the results of the hardware scan.
       # <nixpkgs/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix>
       # <nixpkgs/nixos/modules/installer/cd-dvd/channel.nix>
+      "${builtins.fetchGit { url = "https://github.com/NixOS/nixos-hardware.git"; }}/lenovo/thinkpad/t14"
       ./hardware-configuration.nix
       (import "${home-manager}/nixos")
     ];
 
   # Bootloader.
-  boot.loader.grub.enable = true;
-  boot.loader.grub.device = "/dev/vda";
-  boot.loader.grub.useOSProber = true;
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
 
   # Use latest kernel.
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  # boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  boot.initrd.luks.devices."luks-ac02f74f-6a17-4401-b85a-fee50635a6e9".device = "/dev/disk/by-uuid/ac02f74f-6a17-4401-b85a-fee50635a6e9";
-  # Setup keyfile
-  boot.initrd.secrets = {
-    "/boot/crypto_keyfile.bin" = null;
-  };
-
-  boot.loader.grub.enableCryptodisk = true;
-
-  boot.initrd.luks.devices."luks-f34090ce-5d56-4d5d-b625-704e0a345df8".keyFile = "/boot/crypto_keyfile.bin";
-  boot.initrd.luks.devices."luks-ac02f74f-6a17-4401-b85a-fee50635a6e9".keyFile = "/boot/crypto_keyfile.bin";
-  networking.hostName = "nixos"; # Define your hostname.
+  networking.hostName = "russnix"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
@@ -45,6 +35,8 @@ in
 
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
+
+  console.font = "Lat2-Terminus16";
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
@@ -67,6 +59,11 @@ in
     variant = "";
   };
 
+  fonts.packages = with pkgs; [
+    nerd-fonts.iosevka
+    font-awesome
+  ];
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.russellc = {
     isNormalUser = true;
@@ -78,36 +75,92 @@ in
   home-manager.users.russellc = { pkgs, config, ... }: {
     home.packages = with pkgs; [
       alacritty
-      librewolf
       mako
+      fuzzel
       rofi
     ];
     programs.bash.enable = true;
     programs.rofi.enable = true;
-    programs.waybar.enable = true;
     services.mako.enable = true;
+    programs.waybar.enable = true;
+
+    programs.fuzzel = {
+      enable = true;
+      settings = {
+        main = {
+          terminal = "${pkgs.alacritty}/bin/alacritty";
+        };
+      };
+    };
 
     programs.alacritty = {
       enable = true;
       settings = {
         font = {
           size = 12.0;
-          normal.family = "Iosevka Term SS09";
+          normal.family = "Iosevka Nerd Font Mono";
         };
       };
     };
 
     programs.librewolf = {
       enable = true;
-      settings = {
-        "webgl.disabled" = false;
-        "privacy.resistFingerprinting" = false;
-        "privacy.clearOnShutdown.history" = false;
-        "privacy.clearOnShutdown.cookies" = false;
-        "sidebar.position_start" = false;
-        "sidebar.revamp" = true;
-        "sidebar.verticalTabs" = true;
-        "ui.systemUsesDarkTheme" = true;
+      policies = {
+        ExtensionSettings = {
+          "{446900e4-71c2-419f-a6a7-df9c091e268b}" = {
+            install_url = "https://addons.mozilla.org/firefox/downloads/latest/bitwarden-password-manager/latest.xpi";
+            installation_mode = "force_installed";
+            private_browsing = true;
+          };
+          "{d634138d-c276-4fc8-924b-40a0ea21d284}" = {
+            install_url = "https://addons.mozilla.org/firefox/downloads/latest/1password-x-password-manager/latest.xpi";
+            installation_mode = "force_installed";
+            private_browsing = true;
+            default_area = "navbar";
+          };
+        };
+      };
+      profiles.default = {
+        name = "default";
+        isDefault = true;
+        settings = {
+          "browser.aboutConfig.showWarning" = false;
+          "browser.toolbars.bookmarks.visibility" = "newtab";
+          "browser.compactmode.show" = true;
+          "browser.startup.page" = 3;
+          "browser.warnOnQuit" = false;
+          "webgl.disabled" = false;
+          "privacy.resistFingerprinting" = false;
+          "privacy.clearOnShutdown.history" = false;
+          "privacy.clearOnShutdown.cookies" = false;
+          "privacy.clearOnShutdown.downloads" = false;
+          "privacy.clearOnShutdown_v2.cache" = false;
+          "privacy.clearOnShutdown_v2.cookiesAndStorage" = false;
+          "privacy.clearOnShutdown_v2.browsingHistoryAndDownloads" = false;
+          "sidebar.position_start" = false;
+          "sidebar.revamp" = true;
+          "sidebar.verticalTabs" = true;
+          "ui.systemUsesDarkTheme" = true;
+        };
+        search = {
+          force = true;
+          default = "Kagi";
+          engines = {
+            "Kagi" = {
+              urls = [
+              {
+                template = "https://kagi.com/search?";
+                params = [
+                {
+                  name = "q";
+                  value = "{searchTerms}";
+                }
+                ];
+              }
+              ];
+            };
+          };
+        };
       };
     };
 
@@ -206,6 +259,7 @@ in
   };
 
   services.blueman.enable = true;
+  # services.tzupdate.enable = true;
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
@@ -214,13 +268,22 @@ in
   security.pam.services.swaylock = {};
   security.rtkit.enable = true;
 
+  services.acpid.enable = true;
+  services.fwupd.enable = true;
+  services.logind = {
+    lidSwitch = "hibernate";
+    lidSwitchExternalPower = "ignore";
+    extraConfig = "HandlePowerKey=hibernate";
+  };
+
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
-  hardware.graphics.enable = true;
+  powerManagement.enable = true;
+
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
 
