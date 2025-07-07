@@ -11,6 +11,7 @@ in
     [ # Include the results of the hardware scan.
       # <nixpkgs/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix>
       # <nixpkgs/nixos/modules/installer/cd-dvd/channel.nix>
+      "${builtins.fetchGit { url = "https://github.com/NixOS/nixos-hardware.git"; }}/lenovo/thinkpad/t14"
       ./hardware-configuration.nix
       (import "${home-manager}/nixos")
     ];
@@ -267,11 +268,21 @@ in
   security.pam.services.swaylock = {};
   security.rtkit.enable = true;
 
+  services.acpid.enable = true;
+  services.fwupd.enable = true;
+  services.logind = {
+    lidSwitch = "hibernate";
+    lidSwitchExternalPower = "ignore";
+    extraConfig = "HandlePowerKey=hibernate";
+  };
+
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
+
+  powerManagement.enable = true;
 
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
