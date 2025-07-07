@@ -59,7 +59,8 @@ in
   };
 
   fonts.packages = with pkgs; [
-    iosevka
+    nerd-fonts.iosevka
+    font-awesome
   ];
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
@@ -80,15 +81,7 @@ in
     programs.bash.enable = true;
     programs.rofi.enable = true;
     services.mako.enable = true;
-
-    programs.waybar = {
-      enable = true;
-      style = ''
-        * {
-            font-family: Iosevka;
-          }
-      '';
-    };
+    programs.waybar.enable = true;
 
     programs.fuzzel = {
       enable = true;
@@ -104,7 +97,7 @@ in
       settings = {
         font = {
           size = 12.0;
-          normal.family = "Iosevka";
+          normal.family = "Iosevka Nerd Font Mono";
         };
       };
     };
@@ -131,6 +124,7 @@ in
         isDefault = true;
         settings = {
           "browser.aboutConfig.showWarning" = false;
+          "browser.toolbars.bookmarks.visibility" = "newtab";
           "browser.compactmode.show" = true;
           "browser.startup.page" = 3;
           "browser.warnOnQuit" = false;
