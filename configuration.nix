@@ -16,23 +16,12 @@ in
     ];
 
   # Bootloader.
-  boot.loader.grub.enable = true;
-  boot.loader.grub.device = "/dev/vda";
-  boot.loader.grub.useOSProber = true;
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
 
   # Use latest kernel.
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  # boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  boot.initrd.luks.devices."luks-ac02f74f-6a17-4401-b85a-fee50635a6e9".device = "/dev/disk/by-uuid/ac02f74f-6a17-4401-b85a-fee50635a6e9";
-  # Setup keyfile
-  boot.initrd.secrets = {
-    "/boot/crypto_keyfile.bin" = null;
-  };
-
-  boot.loader.grub.enableCryptodisk = true;
-
-  boot.initrd.luks.devices."luks-f34090ce-5d56-4d5d-b625-704e0a345df8".keyFile = "/boot/crypto_keyfile.bin";
-  boot.initrd.luks.devices."luks-ac02f74f-6a17-4401-b85a-fee50635a6e9".keyFile = "/boot/crypto_keyfile.bin";
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
@@ -67,6 +56,10 @@ in
     variant = "";
   };
 
+  fonts.packages = with pkgs; [
+    iosevka
+  ];
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.russellc = {
     isNormalUser = true;
@@ -80,19 +73,28 @@ in
       alacritty
       librewolf
       mako
+      fuzzel
       rofi
     ];
     programs.bash.enable = true;
     programs.rofi.enable = true;
     programs.waybar.enable = true;
     services.mako.enable = true;
+    programs.fuzzel = {
+      enable = true;
+      settings = {
+        main = {
+          terminal = "${pkgs.alacritty}/bin/alacritty";
+        };
+      };
+    };
 
     programs.alacritty = {
       enable = true;
       settings = {
         font = {
           size = 12.0;
-          normal.family = "Iosevka Term SS09";
+          normal.family = "Iosevka";
         };
       };
     };
@@ -220,7 +222,6 @@ in
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
-  hardware.graphics.enable = true;
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
 
