@@ -73,15 +73,23 @@ in
   home-manager.users.russellc = { pkgs, config, ... }: {
     home.packages = with pkgs; [
       alacritty
-      librewolf
       mako
       fuzzel
       rofi
     ];
     programs.bash.enable = true;
     programs.rofi.enable = true;
-    programs.waybar.enable = true;
     services.mako.enable = true;
+
+    programs.waybar = {
+      enable = true;
+      style = ''
+        * {
+            font-family: Iosevka;
+          }
+      '';
+    };
+
     programs.fuzzel = {
       enable = true;
       settings = {
@@ -103,15 +111,61 @@ in
 
     programs.librewolf = {
       enable = true;
-      settings = {
-        "webgl.disabled" = false;
-        "privacy.resistFingerprinting" = false;
-        "privacy.clearOnShutdown.history" = false;
-        "privacy.clearOnShutdown.cookies" = false;
-        "sidebar.position_start" = false;
-        "sidebar.revamp" = true;
-        "sidebar.verticalTabs" = true;
-        "ui.systemUsesDarkTheme" = true;
+      policies = {
+        ExtensionSettings = {
+          "{446900e4-71c2-419f-a6a7-df9c091e268b}" = {
+            install_url = "https://addons.mozilla.org/firefox/downloads/latest/bitwarden-password-manager/latest.xpi";
+            installation_mode = "force_installed";
+            private_browsing = true;
+          };
+          "{d634138d-c276-4fc8-924b-40a0ea21d284}" = {
+            install_url = "https://addons.mozilla.org/firefox/downloads/latest/1password-x-password-manager/latest.xpi";
+            installation_mode = "force_installed";
+            private_browsing = true;
+            default_area = "navbar";
+          };
+        };
+      };
+      profiles.default = {
+        name = "default";
+        isDefault = true;
+        settings = {
+          "browser.aboutConfig.showWarning" = false;
+          "browser.compactmode.show" = true;
+          "browser.startup.page" = 3;
+          "browser.warnOnQuit" = false;
+          "webgl.disabled" = false;
+          "privacy.resistFingerprinting" = false;
+          "privacy.clearOnShutdown.history" = false;
+          "privacy.clearOnShutdown.cookies" = false;
+          "privacy.clearOnShutdown.downloads" = false;
+          "privacy.clearOnShutdown_v2.cache" = false;
+          "privacy.clearOnShutdown_v2.cookiesAndStorage" = false;
+          "privacy.clearOnShutdown_v2.browsingHistoryAndDownloads" = false;
+          "sidebar.position_start" = false;
+          "sidebar.revamp" = true;
+          "sidebar.verticalTabs" = true;
+          "ui.systemUsesDarkTheme" = true;
+        };
+        search = {
+          force = true;
+          default = "Kagi";
+          engines = {
+            "Kagi" = {
+              urls = [
+              {
+                template = "https://kagi.com/search?";
+                params = [
+                {
+                  name = "q";
+                  value = "{searchTerms}";
+                }
+                ];
+              }
+              ];
+            };
+          };
+        };
       };
     };
 
@@ -210,6 +264,7 @@ in
   };
 
   services.blueman.enable = true;
+  # services.tzupdate.enable = true;
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
