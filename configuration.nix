@@ -79,10 +79,13 @@ in
       fuzzel
       rofi
     ];
+
     programs.bash.enable = true;
     programs.rofi.enable = true;
-    services.mako.enable = true;
     programs.waybar.enable = true;
+
+    services.mako.enable = true;
+    services.network-manager-applet.enable = true;
 
     programs.fuzzel = {
       enable = true;
@@ -176,10 +179,30 @@ in
       };
     };
 
+    programs.swaylock = {
+      enable = true;
+      settings = {
+        color = "000000";
+        show-failed-attempts = true;
+      };
+    };
+
+    services.swayidle = {
+      enable = true;
+      timeouts = [
+        { timeout = 60 * 5; command = "${pkgs.swaylock}/bin/swaylock -fF"; }
+      ];
+    };
+
     # programs.neovim = {
     #   enable = true;
     #   package = pkgs.neovim;
     # };
+
+    gtk.iconTheme = {
+      package = pkgs.hicolor_icon_theme;
+      name = "hicolor";
+    };
 
     wayland.windowManager.sway = {
       enable = true;
@@ -266,6 +289,14 @@ in
 
   security.polkit.enable = true;
   security.pam.services.swaylock = {};
+  security.pam.services.passwd.rules.password.pwquality = {
+    control = "required";
+    modulePath = "${pkgs.libpwquality.lib}/lib/security/pam_pwquality.so";
+    order = config.security.pam.services.passwd.rules.password.unix.order - 10;
+    settings = {
+      minlen = 8;
+    };
+  };
   security.rtkit.enable = true;
 
   services.acpid.enable = true;
