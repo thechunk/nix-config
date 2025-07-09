@@ -83,6 +83,9 @@ in
     ];
 
     programs.bash.enable = true;
+    programs.bash.initExtra = ''
+      PS1="\[\033[1;32m\][\[\e]0;\u@\h: \w\a\]\u@\h:\w]\$\[\033[0m\] "
+    '';
     programs.rofi.enable = true;
     programs.waybar.enable = true;
 
