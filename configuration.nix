@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 let
   home-manager = builtins.fetchTarball https://github.com/nix-community/home-manager/archive/release-25.05.tar.gz;
 in
@@ -201,9 +201,14 @@ in
     #   package = pkgs.neovim;
     # };
 
+    gtk.enable = true;
     gtk.iconTheme = {
-      package = pkgs.hicolor_icon_theme;
-      name = "hicolor";
+      package = pkgs.papirus-icon-theme;
+      name = "Papirus-Dark";
+    };
+    gtk.theme = lib.mkForce {
+      package = pkgs.pop-gtk-theme;
+      name = "Pop-dark";
     };
 
     wayland.windowManager.sway = {
@@ -245,6 +250,7 @@ in
     automake
     autoconf
     xarchiver
+    xdg-utils
   #  wget
   ];
 
@@ -274,6 +280,7 @@ in
     thunar-volman
   ];
   programs.xfconf.enable = true;
+  programs.dconf.enable = true;
   services.gvfs.enable = true;
   services.tumbler.enable = true;
 
