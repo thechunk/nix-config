@@ -203,6 +203,8 @@ in
       ];
     };
 
+    services.trayscale.enable = true;
+
     # programs.neovim = {
     #   enable = true;
     #   package = pkgs.neovim;
@@ -262,6 +264,7 @@ in
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     git
+    jetbrains.ruby-mine
     rocmPackages.clang
     gnumake
     automake
@@ -321,6 +324,10 @@ in
 
   services.blueman.enable = true;
   # services.tzupdate.enable = true;
+  services.tailscale = {
+    enable = true;
+    useRoutingFeatures = "client";
+  };
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
