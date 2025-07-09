@@ -244,6 +244,7 @@ in
     gnumake
     automake
     autoconf
+    xarchiver
   #  wget
   ];
 
@@ -266,6 +267,15 @@ in
   };
   programs.niri.enable = true;
   programs.sway.enable = true;
+
+  programs.thunar.enable = true;
+  programs.thunar.plugins = with pkgs.xfce; [
+    thunar-archive-plugin
+    thunar-volman
+  ];
+  programs.xfconf.enable = true;
+  services.gvfs.enable = true;
+  services.tumbler.enable = true;
 
   # List services that you want to enable:
   services.greetd = {
