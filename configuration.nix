@@ -93,6 +93,7 @@ in
       enable = true;
       settings = {
         main = {
+          font = "Iosevka Nerd Font Mono:size=12";
           terminal = "${pkgs.alacritty}/bin/alacritty";
         };
       };
@@ -134,6 +135,7 @@ in
           "browser.compactmode.show" = true;
           "browser.startup.page" = 3;
           "browser.warnOnQuit" = false;
+          "media.videocontrols.picture-in-picture.video-toggle.enabled" = false;
           "webgl.disabled" = false;
           "privacy.resistFingerprinting" = false;
           "privacy.clearOnShutdown.history" = false;
@@ -201,15 +203,25 @@ in
     #   package = pkgs.neovim;
     # };
 
-    gtk.enable = true;
-    gtk.iconTheme = {
-      package = pkgs.papirus-icon-theme;
-      name = "Papirus-Dark";
+    gtk = {
+      enable = true;
+      font = {
+        name = "Liberation Sans";
+        size = 11;
+      };
+      iconTheme = {
+        package = pkgs.pantheon.elementary-icon-theme;
+        name = "elementary";
+      };
+      theme = lib.mkForce {
+        package = pkgs.lounge-gtk-theme;
+        name = "Lounge-night-compact";
+      };
     };
-    gtk.theme = lib.mkForce {
-      package = pkgs.pop-gtk-theme;
-      name = "Pop-dark";
-    };
+
+    home.pointerCursor.package = pkgs.pantheon.elementary-icon-theme;
+    home.pointerCursor.name = "elementary";
+    home.pointerCursor.gtk.enable = true;
 
     wayland.windowManager.sway = {
       enable = true;
