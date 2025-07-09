@@ -12,6 +12,7 @@ in
       # <nixpkgs/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix>
       # <nixpkgs/nixos/modules/installer/cd-dvd/channel.nix>
       "${builtins.fetchGit { url = "https://github.com/NixOS/nixos-hardware.git"; }}/lenovo/thinkpad/t14"
+      "${builtins.fetchGit { url = "https://github.com/NixOS/nixos-hardware.git"; }}/common/gpu/intel/meteor-lake/"
       ./hardware-configuration.nix
       (import "${home-manager}/nixos")
     ];
@@ -21,7 +22,8 @@ in
   boot.loader.efi.canTouchEfiVariables = true;
 
   # Use latest kernel.
-  # boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernel.sysctl."kernel/sysrq" = 1;
 
   networking.hostName = "russnix"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -229,6 +231,8 @@ in
     home.stateVersion = "25.05";
   };
 
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
@@ -302,10 +306,13 @@ in
   services.acpid.enable = true;
   services.fwupd.enable = true;
   services.logind = {
-    lidSwitch = "hibernate";
+    lidSwitch = "suspend-then-hibernate";
     lidSwitchExternalPower = "ignore";
     extraConfig = "HandlePowerKey=hibernate";
   };
+  systemd.sleep.extraConfig = ''
+    HibernateDelaySec=1h
+  '';
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
@@ -318,13 +325,6 @@ in
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
 
-  hardware.graphics = {
-    enable = true;
-    extraPackages = with pkgs; [
-      intel-media-driver
-      libvdpau-va-gl
-    ];
-  };
   environment.sessionVariables = { LIBVA_DRIVER_NAME = "iHD"; };
 
   # This value determines the NixOS release from which the default
