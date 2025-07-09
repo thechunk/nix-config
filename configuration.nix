@@ -82,6 +82,7 @@ in
       fuzzel
       rofi
       ungoogled-chromium
+      pavucontrol
     ];
 
     programs.bash.enable = true;
