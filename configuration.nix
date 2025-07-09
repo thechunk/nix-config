@@ -62,6 +62,7 @@ in
   };
 
   fonts.packages = with pkgs; [
+    inter
     nerd-fonts.iosevka
     font-awesome
   ];
@@ -80,6 +81,7 @@ in
       mako
       fuzzel
       rofi
+      ungoogled-chromium
     ];
 
     programs.bash.enable = true;
@@ -179,6 +181,17 @@ in
       };
     };
 
+    programs.chromium = {
+      package = pkgs.ungoogled-chromium;
+      commandLineArgs = [
+        "--enable-features=UseOzonePlatform"
+        "--ozone-platform=wayland"
+      ];
+      extensions = [
+        { id = "aeblfdkhhhdcdjpifhhbdiojplfjncoa"; }
+      ];
+    };
+
     programs.mise = {
       enable = true;
       globalConfig = {
@@ -216,7 +229,7 @@ in
     gtk = {
       enable = true;
       font = {
-        name = "Liberation Sans";
+        name = "Inter Display";
         size = 11;
       };
       iconTheme = {
@@ -369,7 +382,10 @@ in
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
 
-  environment.sessionVariables = { LIBVA_DRIVER_NAME = "iHD"; };
+  environment.sessionVariables = {
+    LIBVA_DRIVER_NAME = "iHD";
+    NIXOS_OZONE_WL = "1";
+  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
