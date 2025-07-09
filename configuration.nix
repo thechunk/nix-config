@@ -86,7 +86,12 @@ in
     programs.rofi.enable = true;
     programs.waybar.enable = true;
 
-    services.mako.enable = true;
+    services.mako = {
+      enable = true;
+      settings = {
+        on-button-middle = "exec makoctl menu -n \"$id\" fuzzel -- -d -p 'Select action: '";
+      };
+    };
     services.network-manager-applet.enable = true;
 
     programs.fuzzel = {
