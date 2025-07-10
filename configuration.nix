@@ -71,7 +71,7 @@ in
   users.users.russellc = {
     isNormalUser = true;
     description = "Russell";
-    extraGroups = [ "networkmanager" "wheel" "video" ];
+    extraGroups = [ "networkmanager" "wheel" "video" "docker" ];
     packages = with pkgs; [];
   };
 
@@ -87,8 +87,12 @@ in
 
     programs.bash.enable = true;
     programs.bash.initExtra = ''
+      eval "$(direnv hook bash)"
       PS1="\[\033[1;32m\][\[\e]0;\u@\h: \w\a\]\u@\h:\w]\$\[\033[0m\] "
     '';
+
+    programs.direnv.enable = true;
+
     programs.rofi.enable = true;
     programs.waybar.enable = true;
 
@@ -290,6 +294,7 @@ in
     xdg-utils
   #  wget
   ];
+  virtualisation.docker.enable = true;
 
   environment.etc."greetd/environments".text = ''
     niri-session
