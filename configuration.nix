@@ -96,6 +96,11 @@ in
     programs.rofi.enable = true;
     programs.waybar.enable = true;
 
+    programs.tmux = {
+      enable = true;
+      terminal = "screen-256color";
+    };
+
     services.mako = {
       enable = true;
       settings = {
@@ -286,6 +291,7 @@ in
   environment.systemPackages = with pkgs; [
     git
     jetbrains.ruby-mine
+    tmux
     rocmPackages.clang
     gnumake
     automake
