@@ -96,6 +96,7 @@ in
     programs.rofi.enable = true;
     programs.waybar.enable = true;
 
+    programs.ripgrep.enable = true;
     programs.tmux = {
       enable = true;
       terminal = "screen-256color";
@@ -262,6 +263,17 @@ in
         terminal = "alacritty";
         menu = "rofi -terminal alacritty -show combi -combi-modes drun#run -modes combi";
         bars = [{ command = "waybar"; }];
+      };
+    };
+
+    xdg.mimeApps = {
+      enable = true;
+      defaultApplications = {
+        "text/html" = "librewolf.desktop";
+        "x-scheme-handler/http" = "librewolf.desktop";
+        "x-scheme-handler/https" = "librewolf.desktop";
+        "x-scheme-handler/about" = "librewolf.desktop";
+        "x-scheme-handler/unknown" = "librewolf.desktop";
       };
     };
 
