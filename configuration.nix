@@ -75,6 +75,7 @@ in
     packages = with pkgs; [];
   };
 
+  home-manager.useGlobalPkgs = true;
   home-manager.users.russellc = { pkgs, config, ... }: {
     home.packages = with pkgs; [
       alacritty
@@ -83,6 +84,14 @@ in
       rofi
       ungoogled-chromium
       pavucontrol
+      (jetbrains.ruby-mine.override { vmopts = ''
+       -Dawt.toolkit.name=WLToolkit
+       -Dide.browser.jcef.enabled=false
+      '';})
+      (jetbrains.goland.override { vmopts = ''
+       -Dawt.toolkit.name=WLToolkit
+       -Dide.browser.jcef.enabled=false
+      '';})
     ];
 
     programs.bash.enable = true;
@@ -101,6 +110,16 @@ in
       enable = true;
       terminal = "screen-256color";
       escapeTime = 0;
+    };
+
+    programs.helix = {
+      enable = true;
+      settings = {};
+      languages.language = [{
+        name = "go";
+        auto-format = true;
+        formatter = { command = "goimports"; };
+      }];
     };
 
     services.mako = {
@@ -303,7 +322,6 @@ in
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     git
-    jetbrains.ruby-mine
     tmux
     rocmPackages.clang
     gnumake
@@ -388,13 +406,10 @@ in
   services.acpid.enable = true;
   services.fwupd.enable = true;
   services.logind = {
-    lidSwitch = "suspend-then-hibernate";
+    lidSwitch = "hibernate";
     lidSwitchExternalPower = "ignore";
     extraConfig = "HandlePowerKey=hibernate";
   };
-  systemd.sleep.extraConfig = ''
-    HibernateDelaySec=1h
-  '';
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
